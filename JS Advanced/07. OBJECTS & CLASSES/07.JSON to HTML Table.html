@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>FromJSONToHTMLTable</title>
+    <style>
+        table,
+        th {
+            border: groove;
+            border-collapse: collapse;
+        }
+
+        td {
+            border: 1px solid black;
+        }
+
+        td,
+        th {
+            padding: 5px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="wrapper">
+    </div>
+    <div><table>
+        <tr><th>Name</th><th>Price</th></tr>
+        <tr><td>Tomatoes &amp; Chips</td><td>2.35</td></tr>
+        <tr><td>J&amp;B Chocolate</td><td>0.96</td></tr>
+     </table></div>
+    <script>
+        function fromJSONToHTMLTable(input) {
+            function solve(inputString) {
+
+                function escapeHtml(unsafe) {
+                    return unsafe
+                        .replace(/&/g, "&amp;")
+                        .replace(/</g, "&lt;")
+                        .replace(/>/g, "&gt;")
+                        .replace(/"/g, "&quot;")
+                        .replace(/'/g, "&#039;");
+                }
+
+
+                let outputArray = [];
+                input = JSON.parse(inputString);
+                outputArray.push('<table>');
+                let props = Object.keys(input[0]);
+                let headStr = '   <tr>'
+                props.forEach(prop => {
+                    headStr += `<th>${prop}</th>`;
+                });
+                headStr += '</tr>';
+                outputArray.push(headStr);
+                for (let line of input) {
+                    let rowStr = '   <tr>';
+                    props.forEach(prop => {
+                        let currentProp = line[prop];
+                        if (typeof currentProp === 'string') {
+                            currentProp = escapeHtml(currentProp);
+                        }
+                        rowStr += `<td>${currentProp}</td>`;
+                    });
+                    rowStr += '</tr>';
+                    outputArray.push(rowStr);
+                }
+                outputArray.push('</table>');
+                //console.log(outputArray.join('\n'));
+                return outputArray.join('\n');
+            }
+        }
+        window.onload = function () {
+            let container = document.getElementById('wrapper');
+            container.innerHTML = fromJSONToHTMLTable('[{"Name":"Tomatoes & Chips","Price":2.35},{"Name":"J&B Chocolate","Price":0.96}]');
+        };
+    </script>
+</body>
+
+</html>
