@@ -6,7 +6,7 @@ function toStringExtension() {
     }
 
     Person.prototype.toString = function () {
-        let printLine = `${Object.getPrototypeOf(this).constructor.name} (`;
+        let printLine = `Person (`;
         let keys = Object.keys(this);
         for (let i = 0; i < keys.length - 1; i++) {
             printLine += `${keys[i]}: ${this[keys[i]]}, `
@@ -22,11 +22,18 @@ function toStringExtension() {
     }
 
     Teacher.prototype = Object.create(Person.prototype);
-    // Teacher.prototype.toString = function () {
-    //     Person.prototype.toString.bind(this);
 
-    // }
-    
+    Teacher.prototype.toString = function () {
+        let printLine = `Teacher (`;
+        let keys = Object.keys(this);
+        for (let i = 0; i < keys.length - 1; i++) {
+            printLine += `${keys[i]}: ${this[keys[i]]}, `
+        }
+        printLine += `${keys[keys.length - 1]}: ${this[keys[keys.length - 1]]})`
+        console.log(printLine);
+        return printLine;
+    }
+        
     function Student(name, email, course) {
         Person.call(this, name, email);
         this.course = course;
@@ -34,8 +41,19 @@ function toStringExtension() {
 
     Student.prototype = Object.create(Person.prototype);
 
-    let obj = new Teacher('Pesho', 'mail', 'aaa');
-    obj.toString();
+    Student.prototype.toString = function () {
+        let printLine = `Student (`;
+        let keys = Object.keys(this);
+        for (let i = 0; i < keys.length - 1; i++) {
+            printLine += `${keys[i]}: ${this[keys[i]]}, `
+        }
+        printLine += `${keys[keys.length - 1]}: ${this[keys[keys.length - 1]]})`
+        console.log(printLine);
+        return printLine;
+    }
+    
+    // let obj = new Teacher('Pesho', 'mail', 'aaa');
+    // obj.toString();
     return {
         Person,
         Teacher,
