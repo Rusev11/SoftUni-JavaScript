@@ -34,7 +34,6 @@ router.post('/create', (req, res) => {
         imageUrl,
         difficultyLevel
     } = req.body
-    console.log(req.body.name);
     const newCube = new Cube (name, description, imageUrl, difficultyLevel);
     newCube.save(()=>{
         res.redirect('/');
