@@ -1,8 +1,19 @@
+
 const fs = require('fs');
 const path = require('path');
 const filePath = path.join(__dirname, '..', 'config/database.json');
 const Cube = require('../models/cubeModel');
 const Accessory = require('../models/accessoryModel');
+const User = require('../models/userModel');
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
+const { resolve } = require('path');
+
+const privateKey = '1234';
+
+function generateToken(data) {
+    return jwt.sign(data, privateKey);
+}
 
 
 function getCubes(callback) {
@@ -13,16 +24,6 @@ function getCubes(callback) {
         }
         callback(cubes);
     }).lean();
-}
-
-function saveCubes(cubes, callback) {
-    fs.writeFile(filePath, JSON.stringify(cubes), (error) => {
-        if (error) {
-            throw error;
-        }
-        console.log('Cubes successfully saved in DB');
-        callback();
-    })
 }
 
 function saveCube(cube, callback) {
@@ -112,13 +113,13 @@ function getCurrentAccessoriesForDetailsPage(cubeID, callback) {
                 };
             });
             callback(accessories, currentCube);
-        });
+        }).lean();
     });
 }
 
-function deleteCube(cubeID, callback){
-    Cube.deleteOne({ _id: cubeID}, (error)=>{
-        if(error){
+function deleteCube(cubeID, callback) {
+    Cube.deleteOne({ _id: cubeID }, (error) => {
+        if (error) {
             console.log(error);
             throw error;
         }
@@ -126,15 +127,85 @@ function deleteCube(cubeID, callback){
     })
 }
 
+function saveUser(req, res, callback) {
+    const {
+        username,
+        password
+    } = req.body;
+
+    //hashing
+    bcrypt.genSalt(10, (error, salt) => {
+        if (error) {
+            console.log(error);
+            throw error;
+        }
+        bcrypt.hash(password, salt, (error, hashedPassword) => {
+            if (error) {
+                console.log(error);
+                throw error;
+            }
+            const user = new User({
+                username,
+                password: hashedPassword
+            });
+
+            user.save((error, userObject) => {
+                if (error) {
+                    console.log(error);
+                    throw error;
+                }
+                let token = generateToken({
+                    userID: userObject._id,
+                    username: userObject.username
+                });
+
+                res.cookie('aid', token);
+
+                callback();
+            })
+        })
+    })
+}
+
+function verifyUser(req, res, callback) {
+    const {
+        username,
+        password
+    } = req.body;
+
+    User.findOne({ username }, (error, userObject) => {
+        if (error) {
+            console.log(error);
+            throw error;
+        }
+        bcrypt.compare(password, userObject.password, (error, result) => {
+            if (error) {
+                console.log(error);
+                throw error;
+            }
+            
+            if (result) {
+                let token = generateToken({
+                    userID: userObject._id,
+                    username: userObject.username
+                });
+                res.cookie('aid', token);
+            }
+            callback();
+        });
+    })
+}
+
 
 module.exports = {
     saveCube,
-    saveCubes,
     getCubes,
     getCube,
     saveAccessory,
     getCurrentAccessories,
     updateCube,
     getCurrentAccessoriesForDetailsPage,
-    deleteCube
+    deleteCube,
+    saveUser,
+    verifyUser
 }
