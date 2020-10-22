@@ -7,7 +7,8 @@ const Accessory = require('../models/accessoryModel');
 const User = require('../models/userModel');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const { resolve } = require('path');
+// const { resolve } = require('path');
+// const { config } = require('dotenv/types');
 
 const privateKey = '1234';
 
@@ -130,9 +131,16 @@ function deleteCube(cubeID, callback) {
 function saveUser(req, res, callback) {
     const {
         username,
-        password
+        password,
+        repeatPassword
     } = req.body;
 
+
+    if (!password || password.length < 8 || password.match(/[^A-Za-z0-9]+/) || password!=repeatPassword || !username) {
+        console.log('Password is not valid');
+        res.redirect('/register?error=true');
+        return;
+    }
     //hashing
     bcrypt.genSalt(10, (error, salt) => {
         if (error) {
@@ -144,39 +152,46 @@ function saveUser(req, res, callback) {
                 console.log(error);
                 throw error;
             }
+
             const user = new User({
                 username,
                 password: hashedPassword
             });
+                user.save((error, userObject) => {
+                    if (error) {
+                        callback(error);
+                        return;
+                    }
+                    let token = generateToken({
+                        userID: userObject._id,
+                        username: userObject.username
+                    });
 
-            user.save((error, userObject) => {
-                if (error) {
-                    console.log(error);
-                    throw error;
-                }
-                let token = generateToken({
-                    userID: userObject._id,
-                    username: userObject.username
+                    res.cookie('aid', token);
+
+                    callback();
                 });
-
-                res.cookie('aid', token);
-
-                callback();
-            })
-        })
-    })
-}
+        });
+    });
+};
 
 function verifyUser(req, res, callback) {
     const {
         username,
         password
     } = req.body;
-
+    if (!username || !password) {
+        callback('notFound');
+        return;
+    }
     User.findOne({ username }, (error, userObject) => {
         if (error) {
             console.log(error);
             throw error;
+        }
+        if (!userObject){
+            callback('notFound');
+            return;
         }
         bcrypt.compare(password, userObject.password, (error, result) => {
             if (error) {
@@ -190,6 +205,9 @@ function verifyUser(req, res, callback) {
                     username: userObject.username
                 });
                 res.cookie('aid', token);
+            } else {
+                callback('notFound');
+                return;
             }
             callback();
         });
