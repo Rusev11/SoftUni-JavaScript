@@ -6,10 +6,8 @@ module.exports = {
     development: {
         port: 5000,
         privateKey: process.env.PRIVATE_KEY,
-        databaseUrl: "mongodb+srv://rusev:123qwe@cluster.bsqnt.mongodb.net/cubicle?retryWrites=true&w=majority",
+        databaseUrl: process.env.DATABASE_URL,
         databaseUrlTest: process.env.DATABASE_URL
-
-        // `mongodb+srv://rusev:${`123qwe`}@cluster.bsqnt.mongodb.net/cubicle?retryWrites=true&w=majority`
     },
     production: {}
 };  
