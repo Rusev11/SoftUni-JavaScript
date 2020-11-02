@@ -1,21 +1,4 @@
-  
-.container {
-    display: inline-block;
-    width: 83%;
-    height: auto;
-    margin-bottom: 5%;
-  }
-
-.title {
-    margin-top: 15vh;
-    text-align:  center;
-    color: #234465;
-    text-decoration: underline;
-    margin-bottom: 2%;
-  }
-
-  .origamis-wrapper {
+.origamis-wrapper {
     width: 100%;
-    /* border:1px solid red; */
     height: 45vh;
   }

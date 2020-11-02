@@ -8,6 +8,8 @@ module.exports = {
         privateKey: process.env.PRIVATE_KEY,
         databaseUrl: process.env.DATABASE_URL,
         databaseUrlTest: process.env.DATABASE_URL
+
+        
     },
     production: {}
 };  

@@ -1,18 +1,35 @@
 import React from 'react';
 import Link from '../link';
 import styles from './index.module.css'
+import getNavigation from '../../utils/navigation';
+import UserContext from '../../Context';
 
-function Aside() {
-    return (
-        <aside className={styles.container}>
-            <Link href="#" title="Going to 1" type="aside"/>
-            <Link href="#" title="Going to 2" type="aside"/>
-            <Link href="#" title="Going to 3" type="aside"/>
-            <Link href="#" title="Going to 4" type="aside"/>
-            <Link href="#" title="Going to 5" type="aside"/>
-            <Link href="#" title="Going to 6" type="aside"/>
-        </aside>
-    )
+class Aside extends React.Component {
+    static contextType = UserContext;
+    
+    render() {
+        const {
+            loggedIn,
+            user
+        } = this.context; 
+        const links = getNavigation(loggedIn, user);
+        return (
+            <aside className={styles.container}>
+                {
+                    links.map(navElement => {
+                        return (
+                            <Link
+                                key={navElement.title}
+                                href={navElement.link}
+                                title={navElement.title}
+                                type="aside"
+                            />
+                        )
+                    })
+                }
+            </aside>
+        )
+    }
 }
 
 export default Aside;

@@ -1,21 +1,38 @@
 import React from 'react';
+import getNavigation from '../../utils/navigation';
 import Link from '../link';
 import styles from './index.module.css'
+import UserContext from '../../Context';
 
-function Footer(){
-    return (
-        <footer className={styles.footer}>
-            <div>
-            <Link href="#" title="Going to 1" type="header" />
-            <Link href="#" title="Going to 2" type="header" />
-            <Link href="#" title="Going to 3" type="header" />
-            <Link href="#" title="Going to 4" type="header" />
-            <Link href="#" title="Going to 5" type="header" />
-            <Link href="#" title="Going to 6" type="header" />
-            </div>
-            <p className={styles.university}>Software University 2019</p>
-        </footer>
-    )
+class Footer extends React.Component {
+    static contextType = UserContext;
+
+    render() {
+        const {
+            loggedIn,
+            user
+        } = this.context;
+        const links = getNavigation(loggedIn, user);
+        return (
+            <footer className={styles.footer}>
+                <div>
+                    {
+                        links.map(navElement => {
+                            return (
+                                <Link
+                                    key={navElement.title}
+                                    href={navElement.link}
+                                    title={navElement.title}
+                                    type="footer"
+                                />
+                            )
+                        })
+                    }
+                </div>
+                <p className={styles.university}>Software University 2019</p>
+            </footer>
+        )
+    }
 }
 
 export default Footer;
