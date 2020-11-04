@@ -5,7 +5,7 @@ import image from '../../images/blue-origami-bird.png'
 function Origam({ description, author, index}) {
     return (
         <div className={styles.container}>
-            <img className={styles.image} src={image} />
+            <img alt='logo' className={styles.image} src={image} />
             <div className={styles.description}>
                 <div>
                     <span>{index} - </span>

@@ -1,68 +1,50 @@
-import React from 'react';
+import React, { useState, useContext, useEffect, useCallback} from 'react';
+import { useParams, useHistory } from 'react-router-dom';
 import styles from './index.module.css'
 import PageLayout from '../../components/page-layout';
 import Origamis from '../../components/origamis';
 import UserContext from '../../Context';
 
-class ProfilePage extends React.Component {
-    constructor(props){
-        super(props)
-        this.state = {
-            username: null,
-            posts: null,
-            error: false
-        }
+const ProfilePage = (props) => {
+    const [username, setUsername] = useState(null);
+    const [posts, setPosts] = useState(null);
+    const params = useParams();
+    const history = useHistory();
+    const context = useContext(UserContext);
+
+    const logOut = () => {
+        context.logOut();
+        history.push('/');
     }
 
-    static contextType = UserContext;
-
-    componentDidMount(){
-
-        this.getUser(this.props.match.params.userid);
-    }
-
-    getUser = async (id) => {
+    const getData = useCallback(async () => {
+        const id = params.userid;
         const response = await fetch(`http://localhost:5000/api/user?id=${id}`);
-        if(!response.ok){
-            this.props.history.push('/error');
-        }
+
+        if (!response.ok) {
+            history.push('/error');
+        } else {
         const user = await response.json();
-        this.setState({
-            username: user.username,
-            posts: user.posts && user.posts.length
-        })
-    };
-
-    logOut = ()=>{
-        this.context.logOut();
-        this.props.history.push('/');
-    }
-
-    render(){
-        const {
-            username,
-            posts
-        } = this.state;
-
-        if(!username){
-            return (
-                <PageLayout>
-                    <div>Loading...</div>
-                </PageLayout>
-            )
+        setUsername(user.username);
+        setPosts(user.posts && user.posts.length);
         }
-        return (
-            <PageLayout>
-                <div className={styles.container}>
-                    <p>User: {username}</p>
-                    <p>Posts: {posts}</p>
+    }, [params.userid, history]);
 
-                    <button onClick={this.logOut}>Logout</button>
-                </div>
-                <Origamis length={3}/>
-            </PageLayout>
-        )
-    }
+    useEffect(() => {
+        getData()
+    }, [getData]);
+
+    return (
+        <PageLayout>
+            <div className={styles.container}>
+                <p>User: {username}</p>
+                <p>Posts: {posts}</p>
+
+                <button onClick={logOut}>Logout</button>
+            </div>
+            <Origamis length={3} />
+        </PageLayout>
+    )
 }
 
 export default ProfilePage;

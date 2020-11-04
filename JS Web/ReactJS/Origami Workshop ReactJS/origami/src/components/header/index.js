@@ -10,13 +10,12 @@ class Header extends React.Component {
 
     render() {
         const {
-            loggedIn,
             user
         } = this.context;
-        const links = getNavigation(loggedIn, user);
+        const links = getNavigation(user);
         return (
             <header className={styles.navigation}>
-                <img className={styles.logo} src={logo} />
+                <img alt='logo' className={styles.logo} src={logo} />
                 {
                     links.map(navElement => {
                         return (

@@ -25,7 +25,6 @@ class RegisterPage extends React.Component {
         const {
             username,
             password,
-            rePassword
         } = this.state;
 
         await authenticate('http://localhost:5000/api/user/register', {

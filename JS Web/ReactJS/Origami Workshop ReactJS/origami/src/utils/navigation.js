@@ -1,4 +1,4 @@
-function getNavigation(loggedIn, user) {
+function getNavigation(user) {
     const authLinks = [
         {
             title: 'Publication',
@@ -28,6 +28,7 @@ function getNavigation(loggedIn, user) {
             link: '/register'
         },
     ];
+    const loggedIn = user && user.loggedIn;
     return loggedIn ? authLinks : guestLinks;
 }
 

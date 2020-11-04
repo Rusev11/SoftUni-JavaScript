@@ -9,10 +9,9 @@ class Footer extends React.Component {
 
     render() {
         const {
-            loggedIn,
             user
         } = this.context;
-        const links = getNavigation(loggedIn, user);
+        const links = getNavigation(user);
         return (
             <footer className={styles.footer}>
                 <div>
